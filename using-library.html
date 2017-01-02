@@ -31,7 +31,42 @@
       	<h2>Using the library</h2>
       	<p>
       		Set up a client and set the credentials to the Adyen platform.
-      	</p>  
+      	</p>
+      		<pre style="width:100%;display:inline-block;margin:1px;padding:10px;text-align:left">
+        <code class="python" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+Import Adyen
+
+adyenbase = Adyen.Adyen()
+
+adyenbase.payment.client.username = "your web service user name"
+adyenbase.payment.client.skin_code = "your skin code"
+adyenbase.payment.client.hmac = "A374... your hmac key associated with this skin"
+adyenbase.payment.client.platform = "test" # test or live
+adyenbase.payment.client.merchant_account = "your merchant account name"
+adyenbase.payment.client.password = "your web service user password"
+        </code>
+        </pre>
+        
+        <p>
+        The example connects you to the Adyen test platform. If you want to use our live platform use:
+        </p>
+<pre style="width:100%;display:inline-block;margin:1px;padding:10px;text-align:left">
+<code class="python" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+adyenbase.payment.client.platform = "live"
+</code>
+</pre>
+
+<p>
+You can now use the following services:
+</p>
+<ul>
+	<li><a title="Payment" href="payment.html">Payment</a></li>
+	<li><a title="Recurring" href="recurring.html">Recurring</a></li>
+	<li><a title="Modification" href="modification.html">Modification</a></li>
+	<li><a title="Directory Lookup" href="directory-lookup.html">Directory Lookup</a></li>
+</ul>
+
+
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/Adyen">Adyen</a></p>

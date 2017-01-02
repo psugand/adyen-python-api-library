@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Adyen-python-api-library by Adyen</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Adyen-python-api-library</h1>
+        <p>Adyen API Library for Python</p>
+
+        <p class="view"><a href="https://github.com/Adyen/adyen-python-api-library">View the Project on GitHub <small>Adyen/adyen-python-api-library</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/Adyen/adyen-python-api-library/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/Adyen/adyen-python-api-library/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/Adyen/adyen-python-api-library">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+      	<h1>Payment</h1>
+      		<p>
+      			The payment service has the following methods:
+      		</p>
+      		<h2>authorise</h2>
+      		<p>
+      			With authorise method you can choose between full API integration (for PCI compliant merchants) or our Easy encryption solution.
+      		</p>
+      		<h3>API</h3>
+      					<pre>
+			<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request[<span class="hljs-string">'amount'</span>] = {<span class="hljs-string">"value"</span>:<span class="hljs-string">"12345"</span>,<span class="hljs-string">"currency"</span>:<span class="hljs-string">"USD"</span>}
+request['card'] = {
+	"number":"4111111111111111",
+	"expiryMonth":"06",
+	"expiryYear": "2016".
+	"cvc": "737",
+	"holderName": "John Smith"
+}
+request[<span class="hljs-string">'reference'</span>] = reference
+request[<span class="hljs-string">'merchantAccount'</span>] = <span class="hljs-string">"YourMerchantAccountName"</span>
+adyenbase.payment.authorise(request=request)
+        </code>
+        </pre>
+
+			<h3>EE</h3>
+			<pre>
+			<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request[<span class="hljs-string">'additionalData'</span>] = {<span class="hljs-string">"card.encrypted.json"</span>:headers[<span class="hljs-string">'adyen_encrypted_data'</span>]}
+request[<span class="hljs-string">'amount'</span>] = {<span class="hljs-string">"value"</span>:<span class="hljs-string">"12345"</span>,<span class="hljs-string">"currency"</span>:<span class="hljs-string">"USD"</span>]}
+request[<span class="hljs-string">'reference'</span>] = reference
+request[<span class="hljs-string">'merchantAccount'</span>] = <span class="hljs-string">"YourMerchantAccountName"</span>
+adyenbase.payment.authorise(request=request)
+        </code>
+        </pre>
+
+
+			<h2>authorise3D</h2>
+				<pre>
+			<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+
+request[<span class="hljs-string">'merchantAccount'</span>] = "YOUR MERCHANT ACCOUNT"
+request[<span class="hljs-string">'browserInfo'</span>] = {<span class="hljs-string">"userAgent"</span>:<span class="hljs-string">"THE USER AGENT"</span>,<span class="hljs-string">"THE AcceptHeader"</span>:<span class="hljs-string">"ACCEPT HEADER"</span>]}
+request[<span class="hljs-string">'md'</span>] = "MD YOU GET BACK IN POST RESPONSE"
+request[<span class="hljs-string">'paResponse'</span>] = <span class="hljs-string">"paResponse YOU GET BACK IN POST RESPONSE"</span>
+request[<span class="hljs-string">'shopperIP'</span>] = <span class="hljs-string">"IP ADDRESS OF SHOPPER"</span>
+adyenbase.payment.authorise3d(request=request)
+        </code>
+        </pre>		
+
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/Adyen">Adyen</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
