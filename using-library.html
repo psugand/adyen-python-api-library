@@ -44,9 +44,10 @@ adyenbase.payment.client.hmac = "A374... your hmac key associated with this skin
 adyenbase.payment.client.platform = "test" # test or live
 adyenbase.payment.client.merchant_account = "your merchant account name"
 adyenbase.payment.client.password = "your web service user password"
+adyenbase.payment.client.app_name = "Your app name, to identify the app with Adyen."
         </code>
         </pre>
-        
+
         <p>
         The example connects you to the Adyen test platform. If you want to use our live platform use:
         </p>
@@ -57,15 +58,188 @@ adyenbase.payment.client.platform = "live"
 </pre>
 
 <p>
-You can now use the following services:
+You can now use the following library methods:
 </p>
-<ul>
-	<li><a title="Payment" href="payment.html">Payment</a></li>
-	<li><a title="Recurring" href="recurring.html">Recurring</a></li>
-	<li><a title="Modification" href="modification.html">Modification</a></li>
-	<li><a title="Directory Lookup" href="directory-lookup.html">Directory Lookup</a></li>
-</ul>
 
+<h1>Card Payments</h1>
+  <p>
+    The payment service has the following methods:
+  </p>
+  <h2>authorise</h2>
+  <p>
+    With authorise method you can choose between full API integration (for PCI compliant merchants) or our Easy encryption solution.<br>
+    With each library method, the 'merchantAccount' property is optional. By default the 'merchantAccount' attribute set with the class instance will be used.<br>
+    The 'reference' variable indicates a custom id assigned by your application to identify the payment at a later point in time.
+  </p>
+
+  <h3>Easy Encryption - Client Side Encryption</h3>
+  <p>Client Side Encryption is the most common use case of the api. Card data is encrypted client side, in a mobile app or website, with the Adyen Client Side Encryption library.
+    The encrypted data is sent to your server, where using the python api, the payment can be authorised with Adyen. This solution does not require a PCI compliance audit.
+  </p>
+  <pre>
+  <code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request[<span class="hljs-string">'additionalData'</span>] = {<span class="hljs-string">"card.encrypted.json"</span>:headers[<span class="hljs-string">'adyen_encrypted_data'</span>]}
+request[<span class="hljs-string">'amount'</span>] = {<span class="hljs-string">"value"</span>:<span class="hljs-string">"12345"</span>,<span class="hljs-string">"currency"</span>:<span class="hljs-string">"USD"</span>]}
+request[<span class="hljs-string">'reference'</span>] = reference
+result = adyenbase.payment.authorise(request=request)
+    </code>
+    </pre>
+
+  <h3>API</h3>
+
+  <p>
+    With API payments, card data is passed directly to the library.
+  </p>
+        <pre>
+<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request[<span class="hljs-string">'amount'</span>] = {<span class="hljs-string">"value"</span>:<span class="hljs-string">"12345"</span>,<span class="hljs-string">"currency"</span>:<span class="hljs-string">"USD"</span>}
+request['card'] = {
+"number":"4111111111111111",
+"expiryMonth":"06",
+"expiryYear": "2016".
+"cvc": "737",
+"holderName": "John Smith"
+}
+request[<span class="hljs-string">'reference'</span>] = reference
+result = adyenbase.payment.authorise(request=request)
+</code>
+</pre>
+
+<h3>Recurring</h3>
+
+<p>
+  To create a recurring contract, add the following parameters to a standard payment request ( which includes the parameters as described
+  above ). The same 'authorise' method is used just like normal payments. The example shows information added from a client, it is recommended
+  to validate this information before passing it to the payment request.
+</p>
+
+
+<pre>
+  <code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+    request['recurringContract'] = headers['recurringContract'] # ONE CLICK, RECURRING or "ONECLICK,RECURRING"
+    request['shopperEmail'] = headers['shopperEmail']
+    request['shopperReference'] = headers['shopperReference']
+    result = adyen.payment.authorise(request=request)
+  </code>
+</pre>
+
+
+<h2>3D Secure / Authorise 3D</h2>
+
+<p>
+For 3D Secure, read the following additional documentation: https://docs.adyen.com/developers/api-manual#3dsecure.
+The main difference between a '3D secure' payment and a normal authorisation, is that the shopper is redirected to an
+issuer's website to enter their 3D Secure credentials.<br><br>
+This similar to a hpp payment, but requires different information to be passed along.
+<br><br>
+A 3D secure payment can be initiated with the regular 'adyen.payment.authorise' method, except for that the following
+extra parameters are added to the request:
+</p>
+
+<pre>
+<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+params['browserInfo'] = {}
+params['browserInfo']['userAgent'] = request.headers["User-Agent"]
+params['browserInfo']['acceptHeader'] = request.headers["Accept"]
+
+result = adyen.payment.authorise(request=params)
+</code>
+</pre>
+
+<p>
+These parameters will initiate a 'directory lookup' for 3D secure by Adyen, to see if the card is enabled for 3D secure payments.
+If this is the case, the following extra values are give the response, and the resultCode will be 'RedirectShopper':
+<br>
+- paRequest<br>
+- md<br>
+- issuerUrl<br>
+- resultCode = "RedirectShopper"<br><br>
+
+Based on this information the shopper can be redirected to the correct issuer page to enter their 3D secure code.<br>
+Our documentation contains an <a href="https://docs.adyen.com/developers/api-manual#initiatea3dsecurepaymentwithanhtmlform">html example</a> form which can submitted from a client.<br><br>
+Note that the 'PaReq', 'MD' and 'IssuerUrl' are values that correspond with those in the response from calling the authorise method.
+Set these values in the html form, and provide a 'TermUrl' as well, which is a 'callback' url similar to HPP which redirects the shopper
+back to your website.
+</p>
+
+<h3>3D Secure Callback </h3>
+<p>
+The 'TermUrl' to which the shopper will be redirected is a http POST request. The request body contains 'MD'and 'PaRes' properties, the values of which
+need to be passed to the 'adyen.payment.authorise3d' method.<br><br>
+Note that for this request, the same 'browserInfo' object can be passed. ShopperIP is an optional value, but recommended to be added as this is additional data
+used for fraud detection.<br><br>
+
+The result from the authorise3d method will be similar to that of a regular card payment authorisation with the 'adyen.payment.authorise' method.
+</p>
+<pre>
+<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request[<span class="hljs-string">'browserInfo'</span>] = {<span class="hljs-string">"userAgent"</span>:<span class="hljs-string">"User Agent"</span>,<span class="hljs-string">"acceptHeader"</span>:<span class="hljs-string">"Accept Header"</span>]}
+request[<span class="hljs-string">'md'</span>] = "MD value from adyen.payment.authorise3d() response"
+request[<span class="hljs-string">'paResponse'</span>] = <span class="hljs-string">"PaRes value from adyen.payment.authorise3D() response."</span>
+request[<span class="hljs-string">'shopperIP'</span>] = <span class="hljs-string">"Optional: ip address of shopper client"</span>
+result = adyen.payment.authorise3d(request=request)
+</code>
+</pre>
+
+<h2>Modifications</h2>
+
+<h3>Cancel or Refund</h3>
+<p>This request either cancels or refunds a payment depending on the status. If the payment is authorised but not yet settled
+  it is cancelled, if it is settled it is refunded.
+</p>
+<pre>
+<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request['originalReference'] = psp
+request['amount'] = {'currency':'EUR','value':'original amount or lower, in minor units.'}
+
+result = adyenbase.payment.cancel_or_refund(request=request)
+</code>
+</pre>
+
+<h3>Cancel</h3>
+<p>Cancels a payment if the status is still 'authorised', possible only before settlement.
+</p>
+<pre>
+<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request['originalReference'] = "psp reference of original payment."
+
+result = adyenbase.payment.cancel(request=request)
+</code>
+</pre>
+
+<h3>Refund</h3>
+<p>To refund a payment
+</p>
+<pre>
+<code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request['originalReference'] = "psp reference of original payment."
+
+result = adyenbase.payment.cancel(request=request)
+</code>
+</pre>
+
+<h3>Capture</h3>
+<p>
+  To capture a payment. For regular ecommerce, a capture is submitted once the goods are shipped.<br>
+</p>
+
+<pre>
+  <code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request = {}
+request['originalReference'] = "psp reference of original payment."
+request['modificationAmount'] = {'currency':'EUR','value':<same or less than the original payment amount>}
+
+result = adyenbase.payment.capture(request=request)
+  </code>
+</pre>
+
+<h1>Hosted Payment Pages</h1>
 
       </section>
       <footer>
@@ -74,6 +248,6 @@ You can now use the following services:
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
-    
+
   </body>
 </html>
