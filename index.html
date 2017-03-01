@@ -18,9 +18,13 @@
         <h1>Adyen-python-api-library</h1>
         <p>Adyen API Library for Python</p>
 
-        <p class="view"><a href="https://github.com/Adyen/adyen-python-api-library">View the Project on GitHub <small>Adyen/adyen-python-api-library</small></a></p>
+        <p class="view">
+          <a href="https://github.com/Adyen/adyen-python-api-library">View the Project on GitHub <small>Adyen/adyen-python-api-library</small></a>
+        </p>
+
         <br>
-        <a title="Main page" href="index.html">Main page</a>
+        <a title="Installation" href="index.html">Installation</a><br>
+        <a title="Using api features" href="using-library.html">Using api features</a>
         <br><br>
 
 
@@ -32,17 +36,100 @@
         </ul>
       </header>
       <section>
-        <h1><a id="adyen-apis-library-for-python" class="anchor" href="#adyen-apis-library-for-python" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adyen APIs Library for Python</h1>
+
+        <h1><a id="adyen-apis-library-for-python" class="anchor" href="#adyen-apis-library-for-python" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Adyen Python API</h1>
+
         <p>
-          This manual describes API communication to the Adyen payment system using this API library for Python.
-          You will get familiar with the following concepts and scenarios:
+          This is the documentation on how to install and use the Adyen Python API. The API is a Python package which can be installed
+          by downloading the latest release from Github, adding an import statement and creating an instance of the 'Adyen' class.<br><br>
+
+          These docs are written to correspond with the <a href="https://docs.adyen.com/developers">Adyen general documentation</a>. We recommend to read the general docs first
+          and keep a tab open while you use this guide.
+          <br><br>
+          This guide assumes you have a test merchant account with a webservice user created,
+          and a 'hosted payment pages' skin configured. If you do not yet have a merchant account <a href="https://www.adyen.com/signup">sign up here.</a>
         </p>
-        <ul>
-          <li><a title="Install the library" href="install-library.html">Install the library</a></li>
-           <li><a title="Using the library" href="using-library.html">Using the library</a></li>
-        </ul>
-        <h2>DISCLAIMER</h2>
-        <p>The ownership of the content of the Adyen API Library remains with Adyen. The content of the Adyen API Library may only be used in connection with the services of Adyen and subject to the applicable license (Apache License, Version 2.0, the “License”), a copy of which is included in the library. Unless required by applicable law or agreed to in writing, the library is offered and/or distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. Adyen does not warrant that the library or any content will be available uninterrupted or error free, that defects will be corrected, or that the library or its supporting systems are free of viruses or bugs. Please refer to the License for the specific language governing permissions and limitations under the License.</p>
+
+
+          <h1>Installation</h1>
+
+          <p>
+            <h3>Requirements:</h3>
+            <ul>
+              <li>Python 2.7</li>
+              <li>The library is not yet compatible with Python 3</li>
+            </ul>
+            <h3>Optional:</h3>
+            <ul>
+              <li>requests</li>
+              <li>pycurl</li>
+              <li>If neither is installed, the library will use urllib2 by default</li>
+            </ul>
+          </p>
+
+          <p>
+            <h3>Import</h3>
+            <ol>
+              <li>Place the Adyen library directory in your server directory.</li>
+              <li>Import Adyen package in your Python code.</li>
+              <li>Create an instance of the Adyen.Adyen class.</li>
+            </ol>
+          </p>
+
+          <h2 id="init">Creating an Adyen class instance</h2>
+
+          <p>
+          Initialise a class instance, and set the attributes shown below with your credentials
+          and 'hosted payment pages' information.
+          <br><br>
+          </p>
+
+            <pre style="width:100%;display:inline-block;margin:1px;padding:10px;text-align:left">
+              <code class="python" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+  Import Adyen
+
+  ady = Adyen.Adyen()
+
+  ady.payment.client.username = "web service user name"
+  ady.payment.client.skin_code = "hosted payment pages skin code"
+  ady.payment.client.hmac = "hmac key associated with this skin generated in the customer area."
+  ady.payment.client.platform = "test or live"
+  ady.payment.client.merchant_account = "merchant account name"
+  ady.payment.client.password = "web service user password"
+  ady.payment.client.app_name = "Your unique app name, to identify the app with Adyen."
+            </code>
+          </pre>
+
+          <p>
+            The example connects you to the Adyen test platform. If you want to use our live platform use:
+          </p>
+
+          <pre style="width:100%;display:inline-block;margin:1px;padding:10px;text-align:left">
+            <code class="python" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+              adyenbase.payment.client.platform = "live"
+            </code>
+          </pre>
+
+          <p>
+            Now the Adyen Python library is ready to process and manage payments with the Adyen platform.
+          </p>
+
+          <p>
+            Continue reading to learn how to
+            <a title="Using the library" href="using-library.html">implement Adyen API features.</a>
+          </p>
+
+          <br><br><br><br>
+
+        <h3>DISCLAIMER</h3>
+        <p style="font-size:12px">
+          The ownership of the content of the Adyen API Library remains with Adyen.
+          The content of the Adyen API Library may only be used in connection with the services of Adyen and subject to the applicable license (Apache License,
+          Version 2.0, the “License”), a copy of which is included in the library.
+          Unless required by applicable law or agreed to in writing, the library is offered and/or distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+          Adyen does not warrant that the library or any content will be available uninterrupted or error free, that defects will be corrected, or that the library or its supporting systems are free of viruses or bugs.
+          Please refer to the License for the specific language governing permissions and limitations under the License.
+        </p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/Adyen">Adyen</a></p>
