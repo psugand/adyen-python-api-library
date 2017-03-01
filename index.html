@@ -41,7 +41,7 @@
 
         <p>
           This is the documentation on how to install and use the Adyen Python API. The API is a Python package which can be installed
-          by downloading the latest release from Github, adding an import statement and creating an instance of the 'Adyen' class.<br><br>
+          by downloading the latest release from Github.<br><br>
 
           These docs are written to correspond with the <a href="https://docs.adyen.com/developers">Adyen general documentation</a>. We recommend to read the general docs first
           and keep a tab open while you use this guide.
@@ -57,7 +57,6 @@
             <h3>Requirements:</h3>
             <ul>
               <li>Python 2.7</li>
-              <li>The library is not yet compatible with Python 3</li>
             </ul>
             <h3>Optional:</h3>
             <ul>
@@ -93,7 +92,7 @@
   ady.payment.client.username = "web service user name"
   ady.payment.client.skin_code = "hosted payment pages skin code"
   ady.payment.client.hmac = "hmac key associated with this skin generated in the customer area."
-  ady.payment.client.platform = "test or live"
+  ady.payment.client.platform = "test"
   ady.payment.client.merchant_account = "merchant account name"
   ady.payment.client.password = "web service user password"
   ady.payment.client.app_name = "Your unique app name, to identify the app with Adyen."
@@ -106,12 +105,12 @@
 
           <pre style="width:100%;display:inline-block;margin:1px;padding:10px;text-align:left">
             <code class="python" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
-              adyenbase.payment.client.platform = "live"
+  ady.payment.client.platform = "live"
             </code>
           </pre>
 
           <p>
-            Now the Adyen Python library is ready to process and manage payments with the Adyen platform.
+            Now the Adyen Python library is ready for use to process and manage payments with the Adyen platform.
           </p>
 
           <p>

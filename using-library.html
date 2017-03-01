@@ -37,12 +37,12 @@
 
 
       <h1 id="card">Card Payments</h1>
-        <p>
-          The payment service has the following methods:
-        </p>
         <h2 id="authorise">authorise</h2>
         <p>
-          With the authorise method you can choose between full API integration (for PCI compliant merchants) or our client side encryption solution.<br>
+          With the authorise method, a payment is authorised against a shopper's payment method.<br><br>
+          For credit card payments you can choose between full API integration (for PCI compliant merchants) or our client side encryption solution.<br>
+          The client side encryption solution is recommended since it is easier to implement.
+
           The 'merchantAccount' property is optional, by default the value set with the merchant_account attribute on the Adyen class instance is used.
           This value can be changed when payments should be processed over a different merchant account.<br><br>
 
@@ -50,10 +50,16 @@
           This is useful for reconciliation of payments with sales in your system, when using payment reports or when 'server notifications' are enabled.
         </p>
 
-        <h3 id="ee">Easy Encryption - Client Side Encryption</h3>
+        <h3 id="ee">Client Side Encryption</h3>
 
         <p>Client Side Encryption is the most common use case of the api. Card data is encrypted client side, in a mobile app or website, with the Adyen Client Side Encryption library.
-          The encrypted data is sent to your server, where using the python api, the payment can be authorised with Adyen. This solution does not require a PCI compliance audit.
+          The encrypted data is sent to your server, where using the python api, the payment can be authorised with Adyen. This solution does not require a PCI compliance audit.<br><br>
+          This Adyen client side encryption library is available for:<br>
+          - <a href="https://github.com/Adyen/adyen-cse-web">Web</a><br>
+          - <a href="https://github.com/Adyen/adyen-cse-ios">iOS</a><br>
+          - <a href="https://github.com/Adyen/adyen-cse-android">Android</a><br><br>
+
+          The encrypted card data is added to the authorise request. In the example below it is directly get from the client request headers.
         </p>
 
         <pre>
@@ -92,35 +98,77 @@ result = adyenbase.payment.authorise(request=request)
           </code>
         </pre>
 
-        <h3 id="recurring">Recurring</h3>
+        <h2 id="recurring">Recurring</h2>
+
+        <h3 id="creating_recurring">Creating a recurring contract</h3>
 
         <p>
-          To create a recurring contract, add the following parameters to a standard payment request ( which includes the parameters as described
-          above ). The same 'authorise' method is used just like normal payments. The example shows information added from a client, it is recommended
-          to validate this information before passing it to the payment request.
+          To create a recurring contract, add the following parameters to a standard payment request ( in addition to the parameters as shown
+          above ). The same 'authorise' method is used for setting up a recurring contract.<br><br>
+          Possible types of recurring contracts:<br>
+          - <b>ONECLICK</b><br>
+          The shopper opts to store their card details for future use. The shopper is present for the subsequent transaction, for cards the security code (CVC/CVV) is required.<br>
+          - <b>RECURRING</b><br>
+          Payment details are stored for future use. For cards, the security code (CVC/CVV) is not required for subsequent payments. This is used for shopper not present transactions.<br>
+          - <b>ONECLICK, RECURRING</b><br>
+          Payment details are stored for future use. This allows the use of the stored payment details regardless of whether the shopper is on your site or not.<br>
         </p>
 
 
         <pre>
           <code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
-request['recurringContract'] = headers['recurringContract'] # ONE CLICK, RECURRING or "ONECLICK,RECURRING"
-request['shopperEmail'] = headers['shopperEmail']
-request['shopperReference'] = headers['shopperReference']
+request['recurring']['contract'] = "ONE CLICK, RECURRING or ONECLICK,RECURRING"
+request['shopperEmail'] = 'shopper email address'
+request['shopperReference'] = 'shopper first & last name'
 result = adyen.payment.authorise(request=request)
           </code>
         </pre>
 
+        <h3 id="recurring_payment">Making a recurring payment</h3>
+        <p>
+          To submit a payment for a recurring contract, the 'selectedRecurringDetailReference' and 'shopperInteraction' properties need
+          to be added to the request dict to the 'authorise' method.<br><br>
+          The value of the selectedRecurringDetailReference is set to either:<br>
+          - a recurringDetailReference<br>
+          - The string “LATEST” to use the most recently stored recurring detail<br><br>
+          A "recurring detail reference" can be retrieved by listing all recurring contracts for a shopper. The shopper email, shopper reference
+          must be identical to those for which the recurring contract is setup.<br><br>
+          <h4>One click payments</h4>
+          To allow shoppers to make quick purchases, 'one click' recurring contracts can be used. To submit a one click payment based on a recurring
+          contract, set the 'shopperInteraction' to 'Ecommerce' and the 'recurring>contract' value to 'ONECLICK'. The created recurring contract must be of
+          the type 'ONECLICK' or 'ONECLICK,RECURRING' to allow for one click payments.<br><br>
+          <h4>Recurring payment</h4>
+          For a 'regular' recurring payment, meaning the shopper does directly interact with your system for a purchase ( such as subscriptions ), the
+          'shopperInteraction' is set to 'ContAuth' and the 'recurring>contract' value is set to 'RECURRING', the created recurring contract in this case
+          must be either of type 'RECURRING' or 'ONECLICK,RECURRING'.<br><br>
+
+          Code example for recurring payment:
+        </p>
+
+
+        <pre>
+          <code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
+request["shopperEmail"] = "shopper email address"
+request["shopperReference"] = "shopper first & last name"
+
+request["selectedRecurringDetailReference"] = "LATEST or recurringDetailReference"
+request["shopperInteraction"] = "ContAuth or Ecommerce"
+request['recurring'] = {}
+request["recurring"]['contract'] = "RECURRING or ONECLICK"
+result = ady.payment.authorise(request)
+          </code>
+        </pre>
 
         <h2 id="3dsecure">Authorise 3D</h2>
 
         <p>
-          For 3D Secure, read the following additional documentation: https://docs.adyen.com/developers/api-manual#3dsecure.
+          For 3D Secure, please see the following documentation: <a>https://docs.adyen.com/developers/api-manual#3dsecure</a>.<br><br>
           The main difference between a '3D secure' payment and a normal authorisation, is that the shopper is redirected to an
           issuer's website to enter their 3D Secure credentials.<br><br>
           This similar to a hpp payment, but requires different information to be passed along.
           <br><br>
-          A 3D secure payment can be initiated with the regular 'adyen.payment.authorise' method, except for that the following
-          extra parameters are added to the request:
+          A 3D secure payment can be initiated with the regular 'adyen.payment.authorise' method, with the 'User-Agent' and 'Accept'
+          headers from the client being added to the request ( in addition to the regular payment properties as described above ).
         </p>
 
       <pre>
@@ -135,18 +183,19 @@ result = adyen.payment.authorise(request=params)
 
       <p>
         These parameters will initiate a 'directory lookup' for 3D secure by Adyen, to see if the card is enabled for 3D secure payments.
-        If this is the case, the following extra values are give the response, and the resultCode will be 'RedirectShopper':
+        If this is the case, the following extra values are give the response:
         <br>
         - paRequest<br>
         - md<br>
         - issuerUrl<br>
         - resultCode = "RedirectShopper"<br><br>
 
-        Based on this information the shopper can be redirected to the correct issuer page to enter their 3D secure code.<br>
+        The shopper can be redirected to the 'issuerUrl' where they can enter their 3D secure code.<br>
         Our documentation contains an <a href="https://docs.adyen.com/developers/api-manual#initiatea3dsecurepaymentwithanhtmlform">html example</a> form which can submitted from a client.<br><br>
-        Note that the 'PaReq', 'MD' and 'IssuerUrl' are values that correspond with those in the response from calling the authorise method.
-        Set these values in the html form, and provide a 'TermUrl' as well, which is a 'callback' url similar to HPP which redirects the shopper
-        back to your website.
+        Note that the 'PaReq', 'MD' and 'IssuerUrl' are values that correspond with those in the response from calling the authorise method.<br><br>
+
+        The values provided by the authorisation response should be set with the corresponding html form fields. In the HTML form is a 'TermUrl', this url
+        is provided by your application, and similar to hosted payment pages, will be called after the shopper completes the 3D secure authorisation.
       </p>
 
       <h3 id="3dcallback">3D Secure Callback </h3>
