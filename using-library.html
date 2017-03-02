@@ -287,9 +287,9 @@ result = adyenbase.payment.capture(request=request)
       <h1 id="hpp">Hosted Payment Pages</h1>
 
       <p>
-        Hosted Payment Pages ( 'hpp' ) work by redirecting a customer to Adyen's website, to complete a payment there. The benefit is that you do not have to implement
+        Hosted Payment Pages ( 'hpp' ) work by redirecting a customer to Adyen's website, to complete a payment there with their chosen method. <br>The benefit is that you do not have to implement
         a wide range of unique payment methods, and the customer is able to pay with the method they prefer.<br><br>
-        For a general guide on HPP, please read the main Adyen documentation: https://docs.adyen.com/developers/hpp-manual.
+
         Hosted payment pages work with a 'hmac' key and a 'skin code' which are generated in the customer area. These attributes are set with the Adyen class
         instance and will be used by the library to process HPP requests.<br><br>
       </p>
@@ -299,9 +299,8 @@ result = adyenbase.payment.capture(request=request)
       <p>
         To display available payment methods in your site or app, the 'directory lookup' method can be used. This returns a list
         of available payment methods for the shoppers location.<br><br>
-        Below is an example request to the library. The 'countryCode' is optional, if it is set this is taken into account
-        when returning a list of payment methods. The 'skinCode' property is optional, if it is not set the default skinCode
-        attribute set with the Adyen class instance will be used.
+        Below is an example request to the library. The 'countryCode' is optional, it can help defining what payment methods
+        are available to the shopper.
       </p>
 
       <pre>
@@ -312,13 +311,44 @@ request = {
   'sessionValidity': nnow.strftime('%Y-%m-%dT%H:%M:%SZ'),
   'countryCode': 'nl',
   'shipBeforeDate': '2017-01-01',
-  'merchantReference': 'your unique reference',
-  'skinCode': 'your Adyen skin code'
+  'merchantReference': 'your unique reference'
 }
 
 result = Adyen.hpp.directory_lookup(request)
         </code>
       </pre>
+
+      <p>
+        The result will be a list of dicts {'brandCode': 'maestro', 'name': 'Maestro'} from these you can render a selection
+        for the shopper to select a payment method.<br><br>
+        Set the shopper selected brandCode in a hidden html form, submitted along with the other fields:
+      </p>
+
+
+      <pre>
+        <code>
+&lt;form method="post" id="adyenForm" action="https://test.adyen.com/hpp/skipDetails.shtml" name="adyenForm" target="_parent" style="display:none"&gt;
+  &lt;input type="hidden" id="merchantSigHPP" name="merchantSig"/&gt;
+  &lt;input type="hidden" id="sessionValidityHPP" name="sessionValidity"/&gt;
+  &lt;input type="hidden" id="shopperLocaleHPP" name="shopperLocale"/&gt;
+  &lt;input type="hidden" id="merchantAccountHPP" name="merchantAccount"/&gt;
+  &lt;input type="hidden" id="paymentAmountHPP" name="paymentAmount"/&gt;
+  &lt;input type="hidden" id="currencyCodeHPP" name="currencyCode"/&gt;
+  &lt;input type="hidden" id="skinCodeHPP" name="skinCode"/&gt;
+  &lt;input type="hidden" id="merchantReferenceHPP" name="merchantReference"/&gt;
+  &lt;input type="hidden" id="brandCodeHPP" name="brandCode"/&gt;
+  &lt;input type="hidden" id="issuerIdHPP" name="issuerId"/&gt;
+  &lt;input type="hidden" id="merchantReturnDataHPP" name="merchantReturnData"/&gt;
+  &lt;input type="hidden" id="shipBeforeDateHPP" name="shipBeforeDate"/&gt;
+  &lt;!-- for recurring hpp --&gt;
+  &lt;input type="hidden" id="shopperEmailHPP" name="shopperEmail"
+  &lt;input type="hidden" id="shopperReferenceHPP" name="shopperReference"
+  &lt;input type="hidden" id="recurringContractHPP" name="recurringContract"
+  &lt;input type="submit" value="Send"/&gt;
+  &lt;input type="reset"/&gt;
+&lt;/form&gt;
+    </code>
+    </pre>
 
 
 </section>
