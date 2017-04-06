@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
   <head>
@@ -299,7 +300,7 @@ result = adyenbase.payment.capture(request=request)
       <p>
         To display available payment methods in your site or app, the 'directory lookup' method can be used. This returns a list
         of available payment methods for the shoppers location.<br><br>
-        Below is an example request to the library. The 'countryCode' is optional, it can help defining what payment methods
+        Below is an example request to the library. The 'countryCode' is optional, passing it along can help defining what payment methods
         are available to the shopper.
       </p>
 
@@ -319,36 +320,64 @@ result = Adyen.hpp.directory_lookup(request)
       </pre>
 
       <p>
-        The result will be a list of dicts {'brandCode': 'maestro', 'name': 'Maestro'} from these you can render a selection
-        for the shopper to select a payment method.<br><br>
-        Set the shopper selected brandCode in a hidden html form, submitted along with the other fields:
+        The result will an object {'brandCode': 'maestro', 'name': 'Maestro'} from which you can render a
+        payment method selection ui.<br><br>
+        Once the shopper has selected the payment method they choose to pay with, set the brandCode, and
+        depending on payment method, the issuerId in a hidden 'adyenForm' ( as shown below ).<br><br>
+        The form can be constructed as shown in the example below. Note that the form action is sent to 'skipDetails',
+        this means the shopper will immediately end up on the payment page for their selected method.<br><br>
       </p>
-
-
       <pre>
         <code>
 &lt;form method="post" id="adyenForm" action="https://test.adyen.com/hpp/skipDetails.shtml" name="adyenForm" target="_parent" style="display:none"&gt;
-  &lt;input type="hidden" id="merchantSigHPP" name="merchantSig"/&gt;
-  &lt;input type="hidden" id="sessionValidityHPP" name="sessionValidity"/&gt;
-  &lt;input type="hidden" id="shopperLocaleHPP" name="shopperLocale"/&gt;
-  &lt;input type="hidden" id="merchantAccountHPP" name="merchantAccount"/&gt;
-  &lt;input type="hidden" id="paymentAmountHPP" name="paymentAmount"/&gt;
-  &lt;input type="hidden" id="currencyCodeHPP" name="currencyCode"/&gt;
-  &lt;input type="hidden" id="skinCodeHPP" name="skinCode"/&gt;
-  &lt;input type="hidden" id="merchantReferenceHPP" name="merchantReference"/&gt;
-  &lt;input type="hidden" id="brandCodeHPP" name="brandCode"/&gt;
-  &lt;input type="hidden" id="issuerIdHPP" name="issuerId"/&gt;
-  &lt;input type="hidden" id="merchantReturnDataHPP" name="merchantReturnData"/&gt;
-  &lt;input type="hidden" id="shipBeforeDateHPP" name="shipBeforeDate"/&gt;
+  &lt;input type="hidden" id="merchantSig" name="merchantSig"/&gt;
+  &lt;input type="hidden" id="sessionValidity" name="sessionValidity"/&gt;
+  &lt;input type="hidden" id="shopperLocale" name="shopperLocale"/&gt;
+  &lt;input type="hidden" id="merchantAccount" name="merchantAccount"/&gt;
+  &lt;input type="hidden" id="paymentAmount" name="paymentAmount"/&gt;
+  &lt;input type="hidden" id="currencyCode" name="currencyCode"/&gt;
+  &lt;input type="hidden" id="skinCode" name="skinCode"/&gt;
+  &lt;input type="hidden" id="merchantReference" name="merchantReference"/&gt;
+  &lt;input type="hidden" id="brandCode" name="brandCode"/&gt;
+  &lt;input type="hidden" id="issuerId" name="issuerId"/&gt;
+  &lt;input type="hidden" id="merchantReturnData" name="merchantReturnData"/&gt;
+  &lt;input type="hidden" id="shipBeforeDate" name="shipBeforeDate"/&gt;
   &lt;!-- for recurring hpp --&gt;
-  &lt;input type="hidden" id="shopperEmailHPP" name="shopperEmail"
-  &lt;input type="hidden" id="shopperReferenceHPP" name="shopperReference"
-  &lt;input type="hidden" id="recurringContractHPP" name="recurringContract"
+  &lt;input type="hidden" id="shopperEmail" name="shopperEmail"
+  &lt;input type="hidden" id="shopperReference" name="shopperReference"
+  &lt;input type="hidden" id="recurringContract" name="recurringContract"
   &lt;input type="submit" value="Send"/&gt;
   &lt;input type="reset"/&gt;
 &lt;/form&gt;
     </code>
     </pre>
+
+    <p> Submit the form </p>
+
+
+    <br>
+    <pre>
+      <code>
+        document.getElementById('adyenForm').submit();
+      </code>
+    </pre>
+    <br>
+
+    <h1> Other HPP flows</h1>
+    <p>
+    Instead of redirecting to 'skipDetails.shtml', the following option are also available.<br><br>
+    <h2>One-page payment flow</h2>
+    The one-page payment flow consolidates the payment process in a single page. It makes extensive use of JavaScript to manipulate and validate the page content. It is suitable for use with modern browsers and when page complexity is not an issue. Some presentation and validation occurs automatically. For example, the credit card logo is highlighted when the shopper enters the first digits of their card and if the card number is invalid, an error is displayed prior to payment submission.
+    <br>
+    To use this payment flow, you need to make a normal payment request call to <a>pay.shtml.</a>
+    <br><br>
+
+    <h2>Multi-page payment flow</h2>
+    The multi-page payment flow splits the payment process into two or discrete steps or more. It is lightweight and it does not require JavaScript. This ensures maximum compatibility with a wide range of browsers and devices, including mobile phones and PDAs.
+    <br>
+    To use this payment flow, you need to make a normal payment request call to <a>select.shtml</a>.
+  </p>
+
 
 
 </section>
