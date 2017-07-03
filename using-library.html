@@ -214,8 +214,8 @@ result = adyen.payment.authorise(request=params)
         <code class="python hljs" style="word-wrap:break-all;white-space:pre-wrap;overflow:visible">
 request = {}
 request[<span class="hljs-string">'browserInfo'</span>] = {<span class="hljs-string">"userAgent"</span>:<span class="hljs-string">"User Agent"</span>,<span class="hljs-string">"acceptHeader"</span>:<span class="hljs-string">"Accept Header"</span>]}
-request[<span class="hljs-string">'md'</span>] = "MD value from adyen.payment.authorise3d() response"
-request[<span class="hljs-string">'paResponse'</span>] = <span class="hljs-string">"PaRes value from adyen.payment.authorise3D() response."</span>
+request[<span class="hljs-string">'md'</span>] = "MD value from adyen.payment.authorise() response"
+request[<span class="hljs-string">'paResponse'</span>] = <span class="hljs-string">"PaRes value from adyen.payment.authorise() response."</span>
 request[<span class="hljs-string">'shopperIP'</span>] = <span class="hljs-string">"Optional: ip address of shopper client"</span>
 result = adyen.payment.authorise3d(request=request)
         </code>
@@ -265,7 +265,7 @@ result = adyenbase.payment.cancel(request=request)
 request = {}
 request['originalReference'] = "psp reference of original payment."
 
-result = adyenbase.payment.cancel(request=request)
+result = adyenbase.payment.refund(request=request)
         </code>
       </pre>
 
@@ -311,7 +311,6 @@ request = {
   'paymentAmount': '100',
   'sessionValidity': nnow.strftime('%Y-%m-%dT%H:%M:%SZ'),
   'countryCode': 'nl',
-  'shipBeforeDate': '2017-01-01',
   'merchantReference': 'your unique reference'
 }
 
@@ -320,7 +319,7 @@ result = Adyen.hpp.directory_lookup(request)
       </pre>
 
       <p>
-        The result will an object {'brandCode': 'maestro', 'name': 'Maestro'} from which you can render a
+        The result will be an object {'brandCode': 'maestro', 'name': 'Maestro'} from which you can render a
         payment method selection ui.<br><br>
         Once the shopper has selected the payment method they choose to pay with, set the brandCode, and
         depending on payment method, the issuerId in a hidden 'adyenForm' ( as shown below ).<br><br>
