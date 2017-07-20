@@ -1,10 +1,10 @@
-
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import datetime
 from . import util
 from .client import AdyenClient
 from . import validation
+
 
 class AdyenBase(object):
     def __setattr__(self, attr, value):
@@ -20,12 +20,14 @@ class AdyenBase(object):
         if attr in client_attr:
             return self.client[attr]
 
+
 class AdyenServiceBase(AdyenBase):
     def __init__(self, client=""):
         if client:
             self.client = client
         else:
             self.client = AdyenAPIClient()
+
 
 class AdyenRecurring(AdyenServiceBase):
     """This represents the Adyen API Recurring Service.
@@ -38,6 +40,7 @@ class AdyenRecurring(AdyenServiceBase):
         client (AdyenAPIClient, optional): An API client for the service to
             use. If not provided, a new API client will be created.
     """
+
     def __init__(self, client=""):
         super(AdyenRecurring, self).__init__(client=client)
         self.service = "Recurring"
@@ -59,6 +62,7 @@ class AdyenRecurring(AdyenServiceBase):
             else:
                 return self.client.call_api(request, self.service, action, **kwargs)
 
+
 class AdyenHPP(AdyenServiceBase):
     """This represents the Adyen HPP  Service.
 
@@ -71,6 +75,7 @@ class AdyenHPP(AdyenServiceBase):
         client (AdyenAPIClient, optional): An API client for the service to
             use. If not provided, a new API client will be created.
     """
+
     def __init__(self, client=""):
         super(AdyenHPP, self).__init__(client=client)
 
@@ -82,7 +87,8 @@ class AdyenHPP(AdyenServiceBase):
             try:
                 datetime.datetime.strptime(request['sessionValidity'], '%Y-%m-%dT%H:%M:%SZ')
             except ValueError:
-                raise ValueError("Incorrect date format, should be Y-m-dH:M:SZ, use datetime.strftime('%Y-%m-%dT%H:%M:%SZ') to format a datetime object.")
+                raise ValueError(
+                    "Incorrect date format, should be Y-m-dH:M:SZ, use datetime.strftime('%Y-%m-%dT%H:%M:%SZ') to format a datetime object.")
 
             return self.client.call_hpp(request, action)
 
@@ -93,20 +99,23 @@ class AdyenHPP(AdyenServiceBase):
         else:
             action = "select"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
 
             if action == "skipDetails":
                 if "issuerId" not in request:
                     request['issuerId'] = ""
             if type(request['sessionValidity']) is not str:
-                raise TypeError('HPP: sessionValidity must be type of str, use datetime.strftime to convert and format.')
-            if all (k in request for k in ("shopperEmail","shopperReference","recurringContract")):
+                raise TypeError(
+                    'HPP: sessionValidity must be type of str, use datetime.strftime to convert and format.')
+            if all(k in request for k in ("shopperEmail", "shopperReference", "recurringContract")):
                 recc = request['recurringContract']
                 if recc != 'ONECLICK' and recc != 'RECURRING' and recc != 'ONECLICK,RECURRING':
-                    raise ValueError("HPP: recurringContract must be on of the following values: 'ONECLICK', 'RECURRING', 'ONECLICK,RECURRING'")
+                    raise ValueError(
+                        "HPP: recurringContract must be on of the following values: 'ONECLICK', 'RECURRING', 'ONECLICK,RECURRING'")
 
-            result = self.client.hpp_payment(request,action)
+            result = self.client.hpp_payment(request, action)
             return result
+
 
 class AdyenPayment(AdyenServiceBase):
     """This represents the Adyen API Payment Service.
@@ -127,6 +136,7 @@ class AdyenPayment(AdyenServiceBase):
         client (AdyenAPIClient, optional): An API client for the service to
             use. If not provided, a new API client will be created.
     """
+
     def __init__(self, client=""):
         super(AdyenPayment, self).__init__(client=client)
         self.service = "Payment"
@@ -135,13 +145,15 @@ class AdyenPayment(AdyenServiceBase):
 
         action = "authorise"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             if 'shopperEmail' in request:
                 if request['shopperEmail'] == '':
-                    raise ValueError('shopperEmail must contain the shopper email when authorising recurring contracts.')
+                    raise ValueError(
+                        'shopperEmail must contain the shopper email when authorising recurring contracts.')
             if 'shopperReference' in request:
                 if request['shopperReference'] == '':
-                    raise ValueError('shopperReference must contain the shopper name when authorising recurring contracts.')
+                    raise ValueError(
+                        'shopperReference must contain the shopper name when authorising recurring contracts.')
 
             return self.client.call_api(request, self.service, action, **kwargs)
 
@@ -163,7 +175,8 @@ class AdyenPayment(AdyenServiceBase):
 
         if validation.check_in(request, action):
             if request['modificationAmount']["value"] == "" or request['modificationAmount']['value'] == "0":
-                raise ValueError("Set the 'modificationAmount' to the original transaction amount, or less for a partial capture. modificationAmount should be an object with the following keys: {'currency':,'value':}")
+                raise ValueError(
+                    "Set the 'modificationAmount' to the original transaction amount, or less for a partial capture. modificationAmount should be an object with the following keys: {'currency':,'value':}")
             if request['originalReference'] == "":
                 raise ValueError("Set the 'originalReference' to the psp reference of the transaction to be modified")
 
@@ -174,14 +187,15 @@ class AdyenPayment(AdyenServiceBase):
 
         action = "refund"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             if request['modificationAmount']['value'] == "" or request['modificationAmount']['value'] == "0":
-                raise ValueError("To refund this payment, provide the original value. Set the value to less than the original amount, to partially refund this payment.")
+                raise ValueError(
+                    "To refund this payment, provide the original value. Set the value to less than the original amount, to partially refund this payment.")
             else:
                 return self.client.call_api(request, self.service, action, **kwargs)
 
     def cancel_or_refund(self, request="", **kwargs):
         action = "cancelOrRefund"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             return self.client.call_api(request, self.service, action, **kwargs)

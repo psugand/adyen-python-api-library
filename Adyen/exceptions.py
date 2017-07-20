@@ -11,12 +11,12 @@ class AdyenError(Exception):
             headers="",
             status_code=""):
         self.message = message
-        self.raw_request=raw_request
-        self.raw_response=raw_response
-        self.url=url
-        self.psp=psp
-        self.headers=headers
-        self.status_code=status_code
+        self.raw_request = raw_request
+        self.raw_response = raw_response
+        self.url = url
+        self.psp = psp
+        self.headers = headers
+        self.status_code = status_code
 
     def __str__(self):
         return repr(self.message)
@@ -41,9 +41,9 @@ class AdyenAPIResponseError(AdyenError):
             error_code="",
             *args,
             **kwargs):
-        super(AdyenAPIResponseError,self).__init__(message, *args,**kwargs)
-        self.error_code=error_code
-        self.result=result
+        super(AdyenAPIResponseError, self).__init__(message, *args, **kwargs)
+        self.error_code = error_code
+        self.result = result
 
     def __str__(self):
         return repr(self.message)
