@@ -1,6 +1,7 @@
 #!/bin/python
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+import datetime
 
 from . import util
 from .util import generate_hpp_sig
@@ -21,7 +22,7 @@ from .services import (
 
 from .httpclient import HTTPClient
 
-import datetime
+
 
 username = ""
 password = ""

@@ -8,15 +8,15 @@ from . import validation
 
 class AdyenBase(object):
     def __setattr__(self, attr, value):
-        client_attr = ["username","password","platform","app_name"]
+        client_attr = ["username", "password", "platform", "app_name"]
         if attr in client_attr:
             if value:
                 self.client[attr] = value
         else:
             super(AdyenBase, self).__setattr__(attr, value)
 
-    def __getattr__(self,attr):
-        client_attr = ["username","password","platform"]
+    def __getattr__(self, attr):
+        client_attr = ["username", "password", "platform"]
         if attr in client_attr:
             return self.client[attr]
 
@@ -39,21 +39,21 @@ class AdyenRecurring(AdyenServiceBase):
             use. If not provided, a new API client will be created.
     """
     def __init__(self, client=""):
-        super(AdyenRecurring,self).__init__(client=client)
+        super(AdyenRecurring, self).__init__(client=client)
         self.service = "Recurring"
 
     def list_recurring_details(self, request="", **kwargs):
 
         action = "listRecurringDetails"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             return self.client.call_api(request, self.service, action, **kwargs)
 
-    def disable(self, request="",**kwargs):
+    def disable(self, request="", **kwargs):
 
         action = "disable"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             if 'recurringDetailReference' not in request:
                 raise ValueError("Include a 'recurringDetailReference' to disable a specific recurring contract.")
             else:
@@ -72,21 +72,21 @@ class AdyenHPP(AdyenServiceBase):
             use. If not provided, a new API client will be created.
     """
     def __init__(self, client=""):
-        super(AdyenHPP,self).__init__(client=client)
+        super(AdyenHPP, self).__init__(client=client)
 
-    def directory_lookup(self,request="",**kwargs):
+    def directory_lookup(self, request="", **kwargs):
 
         action = "directory"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             try:
-                datetime.datetime.strptime(request['sessionValidity'],'%Y-%m-%dT%H:%M:%SZ')
+                datetime.datetime.strptime(request['sessionValidity'], '%Y-%m-%dT%H:%M:%SZ')
             except ValueError:
                 raise ValueError("Incorrect date format, should be Y-m-dH:M:SZ, use datetime.strftime('%Y-%m-%dT%H:%M:%SZ') to format a datetime object.")
 
-            return self.client.call_hpp(request,action)
+            return self.client.call_hpp(request, action)
 
-    def hpp_payment(self,request="",skipDetails=None,**kwargs):
+    def hpp_payment(self, request="", skipDetails=None, **kwargs):
 
         if skipDetails == True:
             action = "skipDetails"
@@ -127,8 +127,8 @@ class AdyenPayment(AdyenServiceBase):
         client (AdyenAPIClient, optional): An API client for the service to
             use. If not provided, a new API client will be created.
     """
-    def __init__(self,client=""):
-        super(AdyenPayment,self).__init__(client=client)
+    def __init__(self, client=""):
+        super(AdyenPayment, self).__init__(client=client)
         self.service = "Payment"
 
     def authorise(self, request="", **kwargs):
@@ -148,26 +148,26 @@ class AdyenPayment(AdyenServiceBase):
     def authorise3d(self, request="", **kwargs):
         action = "authorise3d"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             return self.client.call_api(request, self.service, action, **kwargs)
 
     def cancel(self, request="", **kwargs):
         action = "cancel"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             return self.client.call_api(request, self.service, action, **kwargs)
 
     def capture(self, request="", **kwargs):
 
         action = "capture"
 
-        if validation.check_in(request,action):
+        if validation.check_in(request, action):
             if request['modificationAmount']["value"] == "" or request['modificationAmount']['value'] == "0":
                 raise ValueError("Set the 'modificationAmount' to the original transaction amount, or less for a partial capture. modificationAmount should be an object with the following keys: {'currency':,'value':}")
             if request['originalReference'] == "":
                 raise ValueError("Set the 'originalReference' to the psp reference of the transaction to be modified")
 
-            response = self.client.call_api(request,self.service,action,**kwargs)
+            response = self.client.call_api(request, self.service, action, **kwargs)
             return response
 
     def refund(self, request="", **kwargs):
