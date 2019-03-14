@@ -12,7 +12,7 @@ actions['select'] = ["sessionValidity", "currencyCode",
                      "paymentAmount", "merchantReference"]
 actions['authorise'] = ["amount", "reference"]
 actions['authorise3d'] = ["md", "paResponse", "browserInfo"]
-actions['authorise3ds2'] = ["merchantAccount", "threeDS2RequestData", "threeDS2Token"]
+actions['authorise3ds2'] = ["merchantAccount", "threeDS2Token"]
 actions['cancel'] = ["originalReference"]
 actions['capture'] = ["modificationAmount", "originalReference"]
 actions['refund'] = ["modificationAmount", "originalReference"]
